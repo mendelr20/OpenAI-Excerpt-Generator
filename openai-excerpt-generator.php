@@ -26,3 +26,17 @@ function openai_excerpt_generator_add_admin_menu() {
 
 // Register settings and fields.
 add_action('admin_init', 'openai_excerpt_generator_settings_init');
+
+function openai_excerpt_generator_enqueue_admin_styles($hook_suffix) {
+    // Check if on the specific settings page for your plugin
+    if ('settings_page_openai_excerpt_generator' === $hook_suffix) {
+        wp_enqueue_style(
+            'openai-excerpt-generator-admin', 
+            plugin_dir_url(__FILE__) . 'admin/css/admin-style.css',
+            array(), // Dependencies
+            '1.0', // Version number of your stylesheet
+            'all' // Media type
+        );
+    }
+}
+add_action('admin_enqueue_scripts', 'openai_excerpt_generator_enqueue_admin_styles');

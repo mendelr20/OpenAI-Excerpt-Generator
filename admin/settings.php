@@ -33,6 +33,14 @@ function openai_excerpt_generator_settings_init() {
         'openai_excerpt_generator_section'
     );
 
+    add_settings_field(
+        'openai_excerpt_selected_posts',
+        __('Select Posts', 'openai-excerpt-generator'),
+        'openai_excerpt_generator_posts_render',
+        'openai_excerpt_generator',
+        'openai_excerpt_generator_section'
+    );
+    
     // Add more fields as needed...
 }
 
@@ -40,12 +48,14 @@ function openai_excerpt_generator_section_callback() {
     echo __('Customize how the OpenAI Excerpt Generator behaves.', 'openai-excerpt-generator');
 }
 
-function openai_excerpt_generator_enable_render() {
+function openai_excerpt_generator_prompt_render() {
     $options = get_option('openai_excerpt_generator_settings');
     ?>
-    <input type='checkbox' name='openai_excerpt_generator_settings[enable]' <?php checked(isset($options['enable']) ? $options['enable'] : 0); ?>>
+    <textarea name='openai_excerpt_generator_settings[prompt]' rows='4' cols='50'><?php echo $options['prompt']; ?></textarea>
     <?php
 }
+
+
 
 function openai_excerpt_generator_excerpt_length_render() {
     $options = get_option('openai_excerpt_generator_settings');
@@ -63,3 +73,19 @@ function openai_excerpt_generator_prompt_render() {
 
 // Initialize settings
 add_action('admin_init', 'openai_excerpt_generator_settings_init');
+
+
+function openai_excerpt_generator_posts_render() {
+    $options = get_option('openai_excerpt_generator_settings');
+    $selected_posts = isset($options['selected_posts']) ? $options['selected_posts'] : array();
+    $args = array(
+        'numberposts' => -1
+    );
+    $posts = get_posts($args);
+
+    echo '<select multiple name="openai_excerpt_generator_settings[selected_posts][]" style="width:100%;max-width:25em;height:150px;">';
+    foreach ($posts as $post) {
+        echo '<option value="' . esc_attr($post->ID) . '"' . (in_array($post->ID, $selected_posts) ? ' selected' : '') . '>' . esc_html($post->post_title) . '</option>';
+    }
+    echo '</select>';
+}
